@@ -18,14 +18,11 @@
   <script>
     async function getLatestMessage(botToken, channelUsername) {
       try {
-        const response = await axios.get(`https://api.telegram.org/bot${botToken}/getUpdates`);
-        const updates = response.data.result;
+        const response = await axios.get(`https://api.telegram.org/bot${botToken}/getChatHistory?chat_id=@${channelUsername}&limit=1`);
+        const messages = response.data.result.messages;
 
-        for (let i = updates.length - 1; i >= 0; i--) {
-          const update = updates[i];
-          if (update.channel_post && update.channel_post.chat.username === channelUsername) {
-            return update.channel_post.text;
-          }
+        if (messages && messages.length > 0) {
+          return messages[0].text;
         }
       } catch (error) {
         console.error(error);
