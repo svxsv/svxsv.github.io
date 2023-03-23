@@ -17,25 +17,21 @@
   </div>
   <script>
     async function getLatestMessage(botToken, channelUsername) {
-  try {
-    const chatResponse = await axios.get(`https://api.telegram.org/bot${botToken}/getChat?chat_id=@${channelUsername}`);
-    if (chatResponse.data.ok) {
-      const chatId = chatResponse.data.result.id;
-      const historyResponse = await axios.get(`https://api.telegram.org/bot${botToken}/getHistory?chat_id=${chatId}&limit=1`);
+      try {
+        const response = await axios.get(`https://api.telegram.org/bot${botToken}/getUpdates`);
+        const updates = response.data.result;
 
-      if (historyResponse.data.ok) {
-        const messages = historyResponse.data.result.messages;
-        if (messages && messages.length > 0) {
-          return messages[0].text;
+        for (let i = updates.length - 1; i >= 0; i--) {
+          const update = updates[i];
+          if (update.channel_post && update.channel_post.chat.username === channelUsername) {
+            return update.channel_post.text;
+          }
         }
+      } catch (error) {
+        console.error(error);
       }
+      return null;
     }
-  } catch (error) {
-    console.error(error);
-  }
-  return null;
-}
-
 
     const botToken = '6181431140:AAFe6wC-tkUQL2kTMdIIZ4uDlnpqLxzvmYg';
     const channelUsername = 'ArmyCAT1';
