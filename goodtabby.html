@@ -16,24 +16,27 @@
     <p id="latest-message"></p>
   </div>
   <script>
-    const axios = require('axios');
+    // Remove the following line, as axios is already included via the script tag in the head section
+    // const axios = require('axios');
 
     async function getLatestMessage(botToken, channelUsername) {
-  try {
-    const response = await axios.get(`https://api.telegram.org/bot${botToken}/getChatHistory?chat_id=@${channelUsername}&limit=1`);
-    const messages = response.data.result.messages;
+      try {
+        const response = await axios.get(`https://api.telegram.org/bot${botToken}/getUpdates`);
+        const updates = response.data.result;
 
-    if (messages && messages.length > 0) {
-      return messages[0].text;
+        for (let i = updates.length - 1; i >= 0; i--) {
+          const update = updates[i];
+          if (update.channel_post && update.channel_post.chat.username === channelUsername) {
+            return update.channel_post.text;
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      return null;
     }
-  } catch (error) {
-    console.error(error);
-  }
-  return null;
-}
 
-
-    const botToken = '6181431140:AAFe6wC-tkUQL2kTMdIIZ4uDlnpqLxzvmYg';
+    const botToken = 'YOUR_BOT_TOKEN';
     const channelUsername = 'ArmyCAT1';
 
     async function displayLatestMessage() {
@@ -45,3 +48,4 @@
   </script>
 </body>
 </html>
+
