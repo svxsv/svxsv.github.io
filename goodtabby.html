@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Widget</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    #telegram-widget {
+      /* Add your desired styles for the widget container */
+    }
+  </style>
+</head>
+<body>
+  <div id="telegram-widget">
+    <p id="latest-message"></p>
+  </div>
+  <script>
+
+const axios = require('axios');
+
+async function getLatestMessage(botToken, channelUsername) {
+  try {
+    const response = await axios.get(`https://api.telegram.org/bot${botToken}/getUpdates`);
+    const updates = response.data.result;
+
+    for (let i = updates.length - 1; i >= 0; i--) {
+      const update = updates[i];
+      if (update.channel_post && update.channel_post.chat.username === channelUsername) {
+        return update.channel_post.text;
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
+}
+  </script>
+  <script>
+    const botToken = '6181431140:AAFe6wC-tkUQL2kTMdIIZ4uDlnpqLxzvmYg';
+    const channelUsername = 'ArmyCAT1';
+
+    async function displayLatestMessage() {
+      const latestMessage = await getLatestMessage(botToken, channelUsername);
+      document.getElementById('latest-message').innerText = latestMessage;
+    }
+
+    displayLatestMessage();
+  </script>
+</body>
+</html>
